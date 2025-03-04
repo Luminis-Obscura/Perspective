@@ -4,6 +4,40 @@ using UnityEngine.Rendering;
 
 public class ThresholdMapGenerator : MonoBehaviour
 {
+    // Singleton instance
+    private static ThresholdMapGenerator _instance;
+
+    // Public accessor for the singleton
+    public static ThresholdMapGenerator Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindFirstObjectByType<ThresholdMapGenerator>();
+                
+                if (_instance == null)
+                {
+                    Debug.LogError("No ThresholdMapGenerator found in the scene!");
+                }
+            }
+            return _instance;
+        }
+    }
+
+    // Make sure we only have one instance
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     public Camera sourceCamera;
     public float threshold = 0.5f; // 0-1 range, pixels darker than this become black
     public RawImage debugImage;
