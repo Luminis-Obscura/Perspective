@@ -55188,6 +55188,11 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
+--- !u!20 &1791395629 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 9005220659476430821, guid: 2d3a85ecde41a8246a79669975912b74, type: 3}
+  m_PrefabInstance: {fileID: 60889539378096550}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1802809690
 Mesh:
   m_ObjectHideFlags: 0
@@ -70351,6 +70356,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 907440856393519896, guid: 2d3a85ecde41a8246a79669975912b74, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3355728866491070058, guid: 2d3a85ecde41a8246a79669975912b74, type: 3}
       propertyPath: threshold
       value: 0.02
@@ -70600,6 +70609,14 @@ PrefabInstance:
       propertyPath: View2D
       value: 
       objectReference: {fileID: 1416260158}
+    - target: {fileID: 828719840340123551, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 1791395629}
+    - target: {fileID: 828719840340123551, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: character2DPrefab
+      value: 
+      objectReference: {fileID: 5218247133992775881, guid: 651edccc32e7a49e4b9dfc45bad12caf, type: 3}
     - target: {fileID: 8616685848737228371, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: MoveSpeed
       value: 8
@@ -70725,7 +70742,12 @@ PrefabInstance:
       propertyPath: m_Follow
       value: 
       objectReference: {fileID: 8338988565591873055}
-    m_RemovedComponents: []
+    - target: {fileID: 8762286023885395323, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
+      propertyPath: m_StandbyUpdate
+      value: 2
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8762286024517199035, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
