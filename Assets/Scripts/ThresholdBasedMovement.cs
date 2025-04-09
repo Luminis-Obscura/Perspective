@@ -74,6 +74,29 @@ public class ThresholdBasedMovement : MonoBehaviour
     
     private CollisionDirection collisionDirections;
     
+    // Add public method to check if character is outside camera view (below)
+    public bool IsOutOfCameraView()
+    {
+        if (gameCamera == null) return false;
+        
+        // Calculate camera bounds in world space
+        float cameraHeight = 2f * gameCamera.orthographicSize;
+        float cameraWidth = cameraHeight * gameCamera.aspect;
+        
+        Vector2 cameraPosition = gameCamera.transform.position;
+        
+        float minY = cameraPosition.y - (cameraHeight / 2);
+        
+        // Get the collision box
+        Vector2 boxCenter = (Vector2)transform.position + collisionBoxOffset;
+        Vector2 halfSize = collisionBoxSize * 0.5f;
+        
+        // Only check if we're below camera's bottom edge by a certain amount
+        float fallThreshold = 2f; // How far below camera before switching back to 3D
+        
+        return (boxCenter.y + halfSize.y) < (minY - fallThreshold);
+    }
+    
     private void Update()
     {
         // Calculate the current collision point and box center
@@ -117,7 +140,7 @@ public class ThresholdBasedMovement : MonoBehaviour
             spriteRenderer.color = Color.red;
         }
         
-        // Ensure isGrounded is properly set for camera bounds
+        // Ensure isGrounded is properly set for threshold detection
         CheckIfGrounded();
     }
     
@@ -134,7 +157,6 @@ public class ThresholdBasedMovement : MonoBehaviour
         
         // Check camera bounds for the full movement
         Vector2 adjustedPosition = targetPosition;
-        bool inCameraBounds = CheckCameraBounds(ref adjustedPosition);
         
         // Calculate collision box at the target position
         Vector2 boxCenter = adjustedPosition + collisionBoxOffset;
@@ -197,15 +219,6 @@ public class ThresholdBasedMovement : MonoBehaviour
                 // Hit ceiling/floor but not walls, try horizontal movement
                 targetPosition = originalPosition + new Vector2(movement.x, 0);
             }
-        }
-        
-        // Final camera bounds check
-        inCameraBounds = CheckCameraBounds(ref targetPosition);
-        
-        if (!inCameraBounds)
-        {
-            // Handle camera bounds collisions if needed
-            HandleCameraBoundsCollisions(ref targetPosition);
         }
         
         // Apply final position
@@ -560,20 +573,10 @@ public class ThresholdBasedMovement : MonoBehaviour
     }
     
     private void CheckIfGrounded()
-    {
-        // Calculate camera bounds in world space
-        float cameraHeight = 2f * gameCamera.orthographicSize;
-        Vector2 cameraPosition = gameCamera.transform.position;
-        float minY = cameraPosition.y - (cameraHeight / 2);
-        
+    {   
         // Get the collision box
         Vector2 boxCenter = (Vector2)transform.position + collisionBoxOffset;
         Vector2 halfSize = collisionBoxSize * 0.5f;
-        Rect collisionBox = new Rect(boxCenter - halfSize, collisionBoxSize);
-        
-        // Check if the bottom of the collision box is very close to the ground (camera bottom)
-        float groundCheckThreshold = 0.1f;
-        bool onCameraGround = Mathf.Abs(collisionBox.yMin - minY) < groundCheckThreshold;
         
         // Check if the player's vertical velocity is close to zero or negative (falling/landed)
         bool stoppedOrFalling = velocity.y <= 0.1f;
@@ -583,15 +586,11 @@ public class ThresholdBasedMovement : MonoBehaviour
         bool onThresholdGround = CheckThresholdCollision(groundCheckCenter);
         
         // Set grounded state if on camera ground OR on threshold ground
-        if ((onCameraGround || onThresholdGround) && stoppedOrFalling)
+        if ( onThresholdGround && stoppedOrFalling)
         {
             if (!isGrounded)
             {
-                if (onCameraGround) {
-                    Debug.Log("Camera ground detected!");
-                } else {
-                    Debug.Log("Threshold ground detected!");
-                }
+                Debug.Log("Threshold ground detected!");
                 isGrounded = true;
                 velocity.y = 0;
             }
