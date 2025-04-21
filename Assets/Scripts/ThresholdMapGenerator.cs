@@ -48,7 +48,7 @@ public class ThresholdMapGenerator : MonoBehaviour
 
     void Start()
     {
-        renderTexture = new RenderTexture(Screen.width, Screen.height, 0);
+        renderTexture = new RenderTexture(Screen.width, Screen.height, 24); // Add depth buffer (24-bit)
         resultMap = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
         
         // Create shader material for fast processing
