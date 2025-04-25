@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/GymA.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/JJLab/Level 1.unity
+    guid: a41fa63454eb3614a886b07a13f53fc8
+  - enabled: 1
+    path: Assets/Scenes/JJLab/Level 2.unity
+    guid: 50b08fc26600da04b8d1a061c819f5f1
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
