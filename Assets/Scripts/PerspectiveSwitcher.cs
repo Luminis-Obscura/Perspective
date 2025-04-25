@@ -241,6 +241,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         
         // Disable first person controller while keeping input system enabled
         controller.enabled = false;
+        inputs.lockInput = true; // Lock input to prevent unwanted movement in 3D mode
         
         // Spawn the 2D character using the active spawn point
         SpawnCharacter2D();
@@ -252,6 +253,7 @@ public class PerspectiveSwitcher : MonoBehaviour
     {
         thresholdMapCanvasImage.SetActive(false);
         controller.enabled = true;
+        inputs.lockInput = false; // Unlock input for 3D movement
         
         // Destroy the 2D character if it exists
         if (currentCharacter2D != null)

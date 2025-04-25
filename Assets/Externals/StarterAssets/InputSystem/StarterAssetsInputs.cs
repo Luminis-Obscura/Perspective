@@ -20,15 +20,19 @@ namespace StarterAssets
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
 
+		[HideInInspector] 
+		public bool lockInput = false;
+
 #if ENABLE_INPUT_SYSTEM
 		public void OnMove(InputValue value)
 		{
+			if (lockInput) return;
 			MoveInput(value.Get<Vector2>());
 		}
 
 		public void OnLook(InputValue value)
 		{
-			if(cursorInputForLook)
+			if(cursorInputForLook && !lockInput)
 			{
 				LookInput(value.Get<Vector2>());
 			}
@@ -36,11 +40,13 @@ namespace StarterAssets
 
 		public void OnJump(InputValue value)
 		{
+			if (lockInput) return;
 			JumpInput(value.isPressed);
 		}
 
 		public void OnSprint(InputValue value)
 		{
+			if (lockInput) return;
 			SprintInput(value.isPressed);
 		}
 #endif
