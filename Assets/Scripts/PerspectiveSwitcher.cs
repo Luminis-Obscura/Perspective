@@ -5,10 +5,8 @@ using UnityEngine.InputSystem;
 public class PerspectiveSwitcher : MonoBehaviour
 {
     [Header("References")]
-    public GameObject thresholdMapCanvasImage;
     public FirstPersonController controller;
     public StarterAssetsInputs inputs;
-    public Camera mainCamera;
 
     [Header("2D Character Settings")]
     // The space the character should be spawned in
@@ -30,7 +28,6 @@ public class PerspectiveSwitcher : MonoBehaviour
     void Start()
     {
         // Make sure we start in 3D mode
-        if (mainCamera == null) mainCamera = Camera.main;
         SwitchTo3D();
 
         // Verify that we have a spawn point manager
@@ -126,7 +123,7 @@ public class PerspectiveSwitcher : MonoBehaviour
             
         // Calculate spawn point position in 2D screen space
         Vector3 spawnPoint3DPos = spawnPoint.transform.position;
-        Vector3 spawnPointScreenPos = mainCamera.WorldToScreenPoint(spawnPoint3DPos);
+        Vector3 spawnPointScreenPos = ThresholdMapGenerator.Instance.sourceCamera.WorldToScreenPoint(spawnPoint3DPos);
         
         // Convert screen space to 2D world space
         Vector2 screenOffset = new Vector2(
@@ -184,7 +181,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         SpawnPoint activeSpawnPoint = spawnPointManager.ActiveSpawnPoint;
         
         // 1. Check if spawn point is within view frustum
-        Vector3 screenPoint = mainCamera.WorldToScreenPoint(activeSpawnPoint.transform.position);
+        Vector3 screenPoint = ThresholdMapGenerator.Instance.sourceCamera.WorldToScreenPoint(activeSpawnPoint.transform.position);
         bool isInView = screenPoint.x > 0 && screenPoint.x < Screen.width &&
                         screenPoint.y > 0 && screenPoint.y < Screen.height &&
                         screenPoint.z > 0; // Make sure it's in front of camera
@@ -196,7 +193,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         }
 
         // 2. Check for direct line of sight
-        Vector3 directionToSpawnPoint = activeSpawnPoint.transform.position - mainCamera.transform.position;
+        Vector3 directionToSpawnPoint = activeSpawnPoint.transform.position - ThresholdMapGenerator.Instance.sourceCamera.transform.position;
         float distanceToSpawnPoint = directionToSpawnPoint.magnitude;
 
         // Cast ray to check for obstacles
@@ -227,7 +224,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         return true;
     }
 
-    void SwitchTo2D()
+    public void SwitchTo2D()
     {
         // Check if we can switch to 2D based on spawn point visibility
         if (!CanSwitchTo2D())
@@ -237,7 +234,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         }
 
         // First make 2D view active
-        thresholdMapCanvasImage.SetActive(true);
+        ThresholdMapGenerator.Instance.debugImage.gameObject.SetActive(true);
         
         // Disable first person controller while keeping input system enabled
         controller.enabled = false;
@@ -249,9 +246,9 @@ public class PerspectiveSwitcher : MonoBehaviour
         is2D = true;
     }
 
-    void SwitchTo3D()
+    public void SwitchTo3D()
     {
-        thresholdMapCanvasImage.SetActive(false);
+        ThresholdMapGenerator.Instance.debugImage.gameObject.SetActive(false);
         controller.enabled = true;
         inputs.lockInput = false; // Unlock input for 3D movement
         
@@ -283,7 +280,7 @@ public class PerspectiveSwitcher : MonoBehaviour
         SpawnPoint activeSpawnPoint = spawnPointManager.ActiveSpawnPoint;
         
         // Calculate the world position from the active spawn point
-        Vector3 spawnPointScreenPos = mainCamera.WorldToScreenPoint(activeSpawnPoint.transform.position);
+        Vector3 spawnPointScreenPos = ThresholdMapGenerator.Instance.sourceCamera.WorldToScreenPoint(activeSpawnPoint.transform.position);
         
         // Map spawn point to 2D space
         Vector3 characterPosition;

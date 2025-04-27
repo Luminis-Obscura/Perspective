@@ -3704,6 +3704,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1550492180}
+  - component: {fileID: 1550492181}
   m_Layer: 0
   m_Name: 2D
   m_TagString: Untagged
@@ -3728,6 +3729,18 @@ Transform:
   - {fileID: 1274631348}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1550492181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1550492179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcb2807866fc74a37b15314d6d643d41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1736324890
 GameObject:
   m_ObjectHideFlags: 0
@@ -5508,7 +5521,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: Level 2
-  triggerDistance: 1
+  touchRadius: 0.5
+  space2D: {fileID: 1550492180}
+  camera2D: {fileID: 600008507}
+  mainCamera: {fileID: 1791395629}
 --- !u!1001 &60889539378096550
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5660,10 +5676,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5da94fd8dedf647d08031c5897b64e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thresholdMapCanvasImage: {fileID: 1416260158}
   controller: {fileID: 135756641613574977}
   inputs: {fileID: 135756641613574975}
-  mainCamera: {fileID: 1791395629}
   spcace2D: {fileID: 1550492179}
   character2DPrefab: {fileID: 1274631347}
   camera2D: {fileID: 600008507}
