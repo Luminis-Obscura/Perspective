@@ -69,6 +69,7 @@ public class ThresholdMapGenerator : MonoBehaviour
             thresholdMaterial = new Material(thresholdShader);
         }
     }
+    
 
     // Create or recreate textures with specified dimensions
     private void CreateTextures(int width, int height)
@@ -209,5 +210,12 @@ public class ThresholdMapGenerator : MonoBehaviour
     {
         Texture2D map = thresholdMaterial != null ? FastGenerateThresholdMap() : SlowGenerateThresholdMap();
         // Store as class variable, save to disk, or use as needed
+    }
+
+    public Texture2D getMap()
+    {
+        Texture2D map = thresholdMaterial != null ? FastGenerateThresholdMap() : SlowGenerateThresholdMap();
+        return map;
+        // Use the map as needed
     }
 }
