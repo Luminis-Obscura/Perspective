@@ -45,11 +45,18 @@ public class ThresholdMapGenerator : MonoBehaviour
     private Texture2D resultMap;
     private Material thresholdMaterial;
     private static readonly int ThresholdProp = Shader.PropertyToID("_Threshold");
+    
+    // Track screen dimensions to detect changes
+    private int lastScreenWidth;
+    private int lastScreenHeight;
 
     void Start()
     {
-        renderTexture = new RenderTexture(Screen.width, Screen.height, 24); // Add depth buffer (24-bit)
-        resultMap = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        // Initialize textures with current screen dimensions
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
+        
+        CreateTextures(lastScreenWidth, lastScreenHeight);
         
         // Create shader material for fast processing
         Shader thresholdShader = Shader.Find("Hidden/ThresholdFilter");
@@ -63,11 +70,57 @@ public class ThresholdMapGenerator : MonoBehaviour
         }
     }
 
+    // Create or recreate textures with specified dimensions
+    private void CreateTextures(int width, int height)
+    {
+        // Clean up existing textures to prevent memory leaks
+        if (renderTexture != null)
+        {
+            renderTexture.Release();
+            Destroy(renderTexture);
+        }
+        
+        if (resultMap != null)
+        {
+            Destroy(resultMap);
+        }
+        
+        // Create new textures with specified dimensions
+        renderTexture = new RenderTexture(width, height, 24); // Add depth buffer (24-bit)
+        resultMap = new Texture2D(width, height, TextureFormat.RGB24, false);
+        
+        // Update tracking variables
+        lastScreenWidth = width;
+        lastScreenHeight = height;
+    }
+
+    // Check if screen dimensions have changed and update textures if needed
+    private bool UpdateTexturesIfNeeded()
+    {
+        if (Screen.width != lastScreenWidth || Screen.height != lastScreenHeight)
+        {
+            CreateTextures(Screen.width, Screen.height);
+            return true;
+        }
+        return false;
+    }
+
     void OnDestroy()
     {
         if (thresholdMaterial != null)
         {
             Destroy(thresholdMaterial);
+        }
+        
+        if (renderTexture != null)
+        {
+            renderTexture.Release();
+            Destroy(renderTexture);
+        }
+        
+        if (resultMap != null)
+        {
+            Destroy(resultMap);
         }
     }
 
@@ -75,13 +128,19 @@ public class ThresholdMapGenerator : MonoBehaviour
     {
         if (debugImage != null)
         {
+            // Check if screen dimensions changed and update textures if needed
+            UpdateTexturesIfNeeded();
+            
             // Use fast method if shader is available, otherwise fallback to slow method
-            debugImage.texture =  FastGenerateThresholdMap();
+            debugImage.texture = FastGenerateThresholdMap();
         }
     }
 
     public Texture2D SlowGenerateThresholdMap()
     {
+        // Check if screen dimensions changed and update textures if needed
+        UpdateTexturesIfNeeded();
+        
         // Capture current frame
         RenderTexture prevTarget = sourceCamera.targetTexture;
         sourceCamera.targetTexture = renderTexture;
@@ -110,6 +169,9 @@ public class ThresholdMapGenerator : MonoBehaviour
 
     public Texture2D FastGenerateThresholdMap()
     {
+        // Check if screen dimensions changed and update textures if needed
+        UpdateTexturesIfNeeded();
+        
         if (thresholdMaterial == null)
         {
             return SlowGenerateThresholdMap(); // Fallback
