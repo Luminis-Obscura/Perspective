@@ -40,6 +40,7 @@ public class ThresholdMapGenerator : MonoBehaviour
 
     public Camera sourceCamera;
     public float threshold = 0.5f; // 0-1 range, pixels darker than this become black
+    public MarchingSquaresContour countourGenerator;
     public RawImage debugImage;
     private RenderTexture renderTexture;
     private Texture2D resultMap;
@@ -132,8 +133,9 @@ public class ThresholdMapGenerator : MonoBehaviour
             // Check if screen dimensions changed and update textures if needed
             UpdateTexturesIfNeeded();
             
-            // Use fast method if shader is available, otherwise fallback to slow method
-            debugImage.texture = FastGenerateThresholdMap();
+            Texture2D texture = FastGenerateThresholdMap();
+            countourGenerator.ProcessTexture(texture);
+            debugImage.texture = texture;
         }
     }
 
