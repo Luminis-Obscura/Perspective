@@ -30,7 +30,7 @@ public class SceneTransitionPoint : MonoBehaviour
 
         if (player == null)
         {
-            player = FindObjectOfType<ThresholdBasedMovement>();
+            player = FindFirstObjectByType<ThresholdBasedMovement>();
             if (player == null) return;
         }
 

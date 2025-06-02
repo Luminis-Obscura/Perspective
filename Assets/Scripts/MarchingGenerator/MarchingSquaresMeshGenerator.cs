@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class MarchingSquaresContour : MonoBehaviour
+public class MarchingSquaresMeshGenerator : MonoBehaviour
 {
     [Header("Input")]
     public Texture2D inputTexture;
@@ -25,6 +25,21 @@ public class MarchingSquaresContour : MonoBehaviour
     [Header("Camera Alignment")]
     public Camera targetCamera;          // leave empty to auto-use Camera.main
     public bool alignToCamera = true;
+    
+    [Header("Collider Settings")]
+    public bool addColliders = true;
+    public ColliderType colliderType = ColliderType.PolygonCollider2D;
+    public bool isTrigger = false;
+    public PhysicsMaterial2D physicsMaterial2D;
+    [SerializeField]
+    private GameObject meshPrefab;
+    
+    public enum ColliderType
+    {
+        PolygonCollider2D,
+        MeshCollider,
+        Both
+    }
     
     private List<List<Vector2>> contours = new List<List<Vector2>>();
     private GameObject contoursParent;
@@ -380,20 +395,101 @@ public class MarchingSquaresContour : MonoBehaviour
             if (contour.Count < 3) continue;
             if (!IsContourClosed(contour)) continue; // Only create meshes for closed contours
             
-            GameObject meshObj = new GameObject($"Mesh_{meshIndex++}");
+            GameObject meshObj;
+            
+            // Use prefab if assigned, otherwise create from scratch
+            meshObj = Instantiate(meshPrefab, meshesParent.transform);
+            meshObj.name = $"Mesh_{meshIndex++}";
+            // Fallback to original behavior if no prefab is assigned
             meshObj.transform.SetParent(meshesParent.transform);
+            meshObj.layer = LayerMask.NameToLayer("2D");
+                
+            // Add default components if they don't exist
+            if (meshObj.GetComponent<MeshFilter>() == null)
+                meshObj.AddComponent<MeshFilter>();
+            if (meshObj.GetComponent<MeshRenderer>() == null)
+                meshObj.AddComponent<MeshRenderer>();
+            
+            // Set transform properties
             meshObj.transform.localPosition = Vector3.zero;
             meshObj.transform.localRotation = Quaternion.identity;
             meshObj.transform.localScale = Vector3.one;
-            meshObj.layer = LayerMask.NameToLayer("2D");
             
-            MeshFilter mf = meshObj.AddComponent<MeshFilter>();
-            MeshRenderer mr = meshObj.AddComponent<MeshRenderer>();
+            // Get or add required components
+            MeshFilter mf = meshObj.GetComponent<MeshFilter>();
+            MeshRenderer mr = meshObj.GetComponent<MeshRenderer>();
             
+            // Create and assign the mesh
             Mesh mesh = CreateMeshFromContour(contour);
             mf.mesh = mesh;
-            mr.material = meshMaterial != null ? meshMaterial : new Material(Shader.Find("Sprites/Default"));
+            
+            // Only set material if using fallback behavior and no prefab is assigned
+            if (meshPrefab == null && mr.material == null)
+            {
+                mr.material = meshMaterial != null ? meshMaterial : new Material(Shader.Find("Sprites/Default"));
+            }
+            
+            // Add colliders if enabled
+            if (addColliders)
+            {
+                AddCollidersToMesh(meshObj, contour, mesh);
+            }
         }
+    }
+    
+    void AddCollidersToMesh(GameObject meshObj, List<Vector2> contour, Mesh mesh)
+    {
+        switch (colliderType)
+        {
+            case ColliderType.PolygonCollider2D:
+                AddPolygonCollider2D(meshObj, contour);
+                break;
+                
+            case ColliderType.MeshCollider:
+                AddMeshCollider(meshObj, mesh);
+                break;
+                
+            case ColliderType.Both:
+                AddPolygonCollider2D(meshObj, contour);
+                AddMeshCollider(meshObj, mesh);
+                break;
+        }
+    }
+    
+    void AddPolygonCollider2D(GameObject meshObj, List<Vector2> contour)
+    {
+        PolygonCollider2D polyCollider = meshObj.GetComponent<PolygonCollider2D>();
+        if (polyCollider == null)
+            polyCollider = meshObj.AddComponent<PolygonCollider2D>();
+        
+        // Convert contour points to world space relative to the mesh object
+        Vector2[] colliderPoints = new Vector2[contour.Count];
+        for (int i = 0; i < contour.Count; i++)
+        {
+            Vector3 worldPos = TextureToLocalSpace(contour[i]);
+            colliderPoints[i] = new Vector2(worldPos.x, worldPos.y);
+        }
+        
+        // Set the collider points
+        polyCollider.points = colliderPoints;
+        polyCollider.isTrigger = isTrigger;
+        
+        // Apply physics material if provided
+        if (physicsMaterial2D != null)
+        {
+            polyCollider.sharedMaterial = physicsMaterial2D;
+        }
+    }
+    
+    void AddMeshCollider(GameObject meshObj, Mesh mesh)
+    {
+        MeshCollider meshCollider = meshObj.GetComponent<MeshCollider>();
+        if (meshCollider == null)
+            meshCollider = meshObj.AddComponent<MeshCollider>();
+        
+        meshCollider.sharedMesh = mesh;
+        meshCollider.convex = false; // Set to true if you need trigger or rigidbody functionality
+        meshCollider.isTrigger = isTrigger;
     }
     
     Mesh CreateMeshFromContour(List<Vector2> contour)

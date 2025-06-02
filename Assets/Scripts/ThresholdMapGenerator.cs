@@ -40,7 +40,7 @@ public class ThresholdMapGenerator : MonoBehaviour
 
     public Camera sourceCamera;
     public float threshold = 0.5f; // 0-1 range, pixels darker than this become black
-    public MarchingSquaresContour countourGenerator;
+    public MarchingSquaresMeshGenerator countourGenerator;
     public RawImage debugImage;
     private RenderTexture renderTexture;
     private Texture2D resultMap;
