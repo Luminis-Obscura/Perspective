@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - 2D Player
+  - Unplaceable
+  - AvoidanceIgnore
   layers:
   - Default
   - TransparentFX
@@ -14,7 +16,7 @@ TagManager:
   - Water
   - UI
   - 2D
-  - 
+  - Overlay
   - 
   - 
   - 
